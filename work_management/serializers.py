@@ -35,6 +35,7 @@ class LikeSerializer(serializers.ModelSerializer):
 class Work_Serializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     comment_count = serializers.SerializerMethodField()
+    artist = UUserSerializer(read_only=True,source='user')
     comments = Comment_Serializer(many=True, read_only=True, source='comment_set')
     likes = LikeSerializer(many=True, read_only=True, source='like_set')
 

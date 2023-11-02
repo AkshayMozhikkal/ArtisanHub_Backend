@@ -31,19 +31,19 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 100  
 
 
-# Create your views here.
-
-
 # Login and Token creations
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
     
   
-
 class Userdetails(ListAPIView):
     queryset = Uuser.objects.all().exclude(is_superuser = True).order_by('id')
     serializer_class = UuserSerializer
     lookup_field = 'id'
+
+class Artisans(ListAPIView):
+    queryset=Uuser.objects.all().exclude(is_superuser = True, is_artisan=False).order_by('id') 
+    serializer_class = UuserSerializer   
     
     
 class UserRegister(CreateAPIView):

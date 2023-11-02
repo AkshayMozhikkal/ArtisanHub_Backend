@@ -9,7 +9,7 @@ from connection_management.models import *
 class UuserSerializer(ModelSerializer):
     class Meta:
         model = Uuser
-        fields = ['id', 'username', 'art', 'first_name', 'last_name', 'email', 'phone', 'profile_image', 'rating', 'is_artisan','is_active','is_superuser', 'password', 'about']
+        fields = ['id', 'username', 'art', 'first_name', 'last_name', 'email', 'phone', 'profile_image', 'rating', 'is_artisan','is_active','is_superuser', 'password', 'about','date_joined']
         extra_kwargs = {
             'password': {'write_only': True}
         }

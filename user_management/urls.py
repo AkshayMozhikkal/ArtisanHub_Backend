@@ -9,6 +9,7 @@ urlpatterns = [
     path('token_refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     path('', Userdetails.as_view(), name='user-details' ),
+    path('artisans/', Artisans.as_view(), name='artisans' ),
     path('details/<int:pk>/', SingleUserdetails.as_view(), name='single_user_details' ),
     path('register/',UserRegister.as_view(), name='register' ),
     path('verify/<str:uidb64>/<str:token>/', VerifyUserView.as_view(), name='verify-user'),

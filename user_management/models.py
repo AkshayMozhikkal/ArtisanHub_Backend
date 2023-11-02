@@ -19,6 +19,7 @@ class Uuser(AbstractUser):
     about = models.TextField(blank=True, null=True)
     field = models.CharField(max_length=60, null=True, blank=True)
     
+    
     # user_connections = models.ManyToManyField(Connection, related_name='user_connections')
     # user_works = models.ManyToManyField(Work, related_name='user_works')
      

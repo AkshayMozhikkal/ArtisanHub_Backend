@@ -10,7 +10,5 @@ urlpatterns = [
     path('remove_connection/<int:id>/', Delete_Connection.as_view(), name='remove_connection'),
     path('user_connections/<int:user_id>', UserConnectionsView.as_view(), name='user_connections'),
     path('search_connection/<int:user_id>/<str:search_key>', Search_Connection.as_view(), name='search_connection'),
-
-    
 ]
  

@@ -9,7 +9,7 @@ from rest_framework import status
 # Create your views here.
 
 class Work_Posts(ListAPIView):
-        queryset = Work.objects.all().order_by("id")
+        queryset = Work.objects.all().order_by("-id")
         serializer_class = Work_Serializer
         
     
