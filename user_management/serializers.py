@@ -91,4 +91,10 @@ class Location_Serializer (ModelSerializer):
          
          
 class PasswordResetSerializer(Serializer):
-    email = serializers.EmailField()         
+    email = serializers.EmailField()    
+    
+    
+class ChangePasswordSerializer(serializers.Serializer):
+    oldPass = serializers.CharField(required=True)
+    newPass = serializers.CharField(required=True)    
+         

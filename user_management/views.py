@@ -16,11 +16,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.contrib.auth import get_user_model
-from rest_framework import permissions
+from rest_framework import  generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q, F
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
+from django.views.decorators.cache import never_cache
+
 
 
 
@@ -42,7 +45,7 @@ class Userdetails(ListAPIView):
     lookup_field = 'id'
 
 class Artisans(ListAPIView):
-    queryset=Uuser.objects.all().exclude(is_superuser = True, is_artisan=False).order_by('id') 
+    queryset=Uuser.objects.filter(is_artisan=True).order_by('id') 
     serializer_class = UuserSerializer   
     
     
@@ -175,7 +178,7 @@ class Upload_image(UpdateAPIView):
 class AddressViewSet(RetrieveUpdateDestroyAPIView):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
-
+    
     def get_object(self):
         user_id = self.kwargs.get('user_id')
         return self.queryset.get(user__id=user_id)
@@ -233,9 +236,46 @@ class PasswordResetAPI(CreateAPIView):
             return Response({'message': 'Password reset email sent.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class PasswordResetConfirmAPI(PasswordResetView):
+class CustomPasswordResetConfirmView(PasswordResetConfirmView, APIView):
     template_name = 'password_reset_confirm.html'
-        
+
+    @never_cache
+    def get(self, request, uidb64, token, *args, **kwargs):      
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_user_model().objects.filter(pk=uid).first()
+
+        if user is not None and default_token_generator.check_token(user, token):
+            login_url = reverse('your_login_url_name')
+            return HttpResponseRedirect(login_url)
+
+        return super().get(request, uidb64, token, *args, **kwargs)
+    
+    
+    
+    
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    model = get_user_model()
+    permission_classes = (IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        user = self.request.user
+        if user.is_google:
+            return Response({"message": "Please try to login with google."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            if not user.check_password(serializer.data.get("oldPass")):
+                return Response({"message": "Please Enter your correct old password or try forgot password link to reset."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+            user.set_password(serializer.data.get("newPass"))
+            user.save()
+            return Response({"message": "Password successfully updated."}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
+      
 
     
     

@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,9 @@ INSTALLED_APPS = [
     'work_management',
     'connection_management',
     'corsheaders',
+    'channels',
+    'chat',
+      
     
 ]
 
@@ -84,7 +88,11 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+
+ASGI_APPLICATION = "backend.asgi.application"
+
+
+
 
 
 REST_FRAMEWORK = {
@@ -118,6 +126,7 @@ DATABASES = {
         'PORT': '5432',           # Leave this empty to use the default PostgreSQL port (5432)
     }
 }
+
 
 
 
@@ -178,6 +187,16 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ROOT_URLCONF = 'backend.urls'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}
 
 
 # SMTP Mail

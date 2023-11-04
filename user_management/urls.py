@@ -2,6 +2,8 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import Userdetails, AddressViewSet, MyTokenObtainPairView, UserRegister , VerifyUserView, Google_Registration, Edit_profile, Upload_image
 from .views import *
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     
@@ -23,8 +25,9 @@ urlpatterns = [
     path('user_all_data/<int:pk>/', User_All_Data.as_view(), name='user_all_data'),
     path('locations/', Get_Locations.as_view(), name='locations'),
     path('password_reset/', PasswordResetAPI.as_view(), name='password_reset'),
-    path('password_reset_confirm/<uidb64>/<token>/', PasswordResetConfirmAPI.as_view(), name='password_reset_confirm'),
+    path('password_reset_confirm/<uidb64>/<token>/', CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password_reset/', include('django.contrib.auth.urls')),
+    path('change_password/', ChangePasswordView.as_view(), name='change_password'),
     path('address/',AddressViewSet.as_view(), name='address' ),
     
 ]
