@@ -12,5 +12,6 @@ urlpatterns = [
     path('delete_comment/<int:id>', Delete_Comment.as_view() , name='delete_comment'),
     path('new_like/', New_Like.as_view() , name='new_like'),
     path('remove_like/', Remove_Like.as_view() , name='remove_like'),
+    path('search_posts/<str:value>', Search_Work_Posts.as_view() , name='search_posts'),
 ]
  

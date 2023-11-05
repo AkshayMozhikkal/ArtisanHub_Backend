@@ -4,6 +4,7 @@ from .models import *
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 
 # Create your views here.
@@ -66,6 +67,25 @@ class Remove_Like(DestroyAPIView):
             return Response({"message":"Like removed"},status=status.HTTP_200_OK)
         except:
                 return Response({"message":"Try again"}, status= status.HTTP_404_NOT_FOUND)
+        
+        
+class Search_Work_Posts(ListAPIView):
+    serializer_class = Work_Serializer 
+     
+    def  get_queryset(self):
+        key = self.kwargs.get('value')
+        if key != "":
+                queryset =  Work.objects.filter(
+                        Q(user__first_name__icontains=key) | 
+                        Q(location__icontains=key) | 
+                        Q(description__icontains=key) 
+                        
+                        )
+                
+                return queryset
+  
+        
+                
                     
              
              
