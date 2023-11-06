@@ -11,9 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import dj_database_url
 import os
 from decouple import config
 from datetime import timedelta
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -125,6 +127,10 @@ DATABASES = {
         'HOST': 'localhost',  # Leave this as localhost if your PostgreSQL server is on the same machine
         'PORT': '5432',           # Leave this empty to use the default PostgreSQL port (5432)
     }
+}
+
+DATABASES = {
+	"default": dj_database_url.parse("postgres://artisanhub_user:Y2l5MobPwAdWaLj8KBXyS3L8mS6wiopl@dpg-cl464b3iu76s73b5rljg-a.singapore-postgres.render.com/artisanhub")
 }
 
 
