@@ -6,7 +6,7 @@ from .models import *
 
 class Banner_List_Create(ListCreateAPIView):
     serializer_class = Banner_Serializer
-    queryset = Banner.objects.all().order_by('id')
+    queryset = Banner.objects.all().order_by('index')
     
 
 class Banner_Edit_Delete(RetrieveUpdateDestroyAPIView):
