@@ -130,9 +130,9 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-# 	"default": dj_database_url.parse("postgres://artisanhub_user:Y2l5MobPwAdWaLj8KBXyS3L8mS6wiopl@dpg-cl464b3iu76s73b5rljg-a.singapore-postgres.render.com/artisanhub")
-# }
+DATABASES = {
+	"default": dj_database_url.parse("postgres://artisanhub_user:Y2l5MobPwAdWaLj8KBXyS3L8mS6wiopl@dpg-cl464b3iu76s73b5rljg-a.singapore-postgres.render.com/artisanhub")
+}
 
 
 
