@@ -25,6 +25,7 @@ urlpatterns = [
     path('user/work/', include('work_management.urls')),
     path('user/connections/', include('connection_management.urls')),
     path('chat/', include('chat.urls')),
+    path('components/', include('art_components.urls')),
 ]
 
 if settings.DEBUG:

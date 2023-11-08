@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'user_management',
     'work_management',
     'connection_management',
+    'art_components',
     'corsheaders',
     'channels',
     'chat',
@@ -77,7 +78,7 @@ AUTH_USER_MODEL = 'user_management.Uuser'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,9 +130,9 @@ DATABASES = {
     }
 }
 
-DATABASES = {
-	"default": dj_database_url.parse("postgres://artisanhub_user:Y2l5MobPwAdWaLj8KBXyS3L8mS6wiopl@dpg-cl464b3iu76s73b5rljg-a.singapore-postgres.render.com/artisanhub")
-}
+# DATABASES = {
+# 	"default": dj_database_url.parse("postgres://artisanhub_user:Y2l5MobPwAdWaLj8KBXyS3L8mS6wiopl@dpg-cl464b3iu76s73b5rljg-a.singapore-postgres.render.com/artisanhub")
+# }
 
 
 
@@ -199,7 +200,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('localhost', 6379)],
+            "hosts": [(config('redis'))],
         },
     },
 }

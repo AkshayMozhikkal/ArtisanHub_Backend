@@ -13,5 +13,6 @@ urlpatterns = [
     path('new_like/', New_Like.as_view() , name='new_like'),
     path('remove_like/', Remove_Like.as_view() , name='remove_like'),
     path('search_posts/<str:value>', Search_Work_Posts.as_view() , name='search_posts'),
+    path('post_count/<int:year>/<int:month>', MonthlyPostCountView.as_view() , name='post_count'),
 ]
  

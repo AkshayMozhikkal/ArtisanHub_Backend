@@ -5,6 +5,8 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
+from datetime import date, timedelta
+from django.db.models import Count
 
 
 # Create your views here.
@@ -83,8 +85,52 @@ class Search_Work_Posts(ListAPIView):
                         )
                 
                 return queryset
+        
+        
+# class MonthlyPostCountView(ListAPIView):
+#     serializer_class = WorkDateSerializer
+
+#     def get_queryset(self):
+        
+#         year = self.kwargs.get('year')
+#         month = self.kwargs.get('month')
+
+        
+#         start_date = date(int(year), int(month), 1)
+#         if int(month) == 12:
+#             end_date = date(int(year) + 1, 1, 1)
+#         else:
+#             end_date = date(int(year), int(month) + 1, 1)
+
+        
+#         queryset = Work.objects.filter(date__gte=start_date, date__lt=end_date).order_by('date')
+#         return queryset        
   
         
+# views.py
+from rest_framework.response import Response
+
+class MonthlyPostCountView(GenericAPIView):
+    serializer_class = WorkDateSerializer
+
+    def get(self, request, year, month):
+        start_date = date(int(year), int(month), 1)
+        if int(month) == 12:
+            end_date = date(int(year) + 1, 1, 1)
+        else:
+            end_date = date(int(year), int(month) + 1, 1)
+
+        queryset = Work.objects.filter(date__gte=start_date, date__lt=end_date)
+        data = {}
+
+        for work in queryset:
+            date_str = work.date.strftime('%Y-%m-%d')
+            if date_str in data:
+                data[date_str] += 1
+            else:
+                data[date_str] = 1
+
+        return Response(data)
                 
                     
              

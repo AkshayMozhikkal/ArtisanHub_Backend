@@ -23,32 +23,69 @@ from django.db.models import Q, F
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.views.decorators.cache import never_cache
+from rest_framework.decorators import api_view
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+
 
 
 
 
 #Pagination Class
 class CustomPagination(PageNumberPagination):
-    page_size = 15  
+    page_size = 4 
     page_size_query_param = 'page_size'
     max_page_size = 100  
-
 
 # Login and Token creations
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = myTokenObtainPairSerializer
-    
-  
+      
 class Userdetails(ListAPIView):
     queryset = Uuser.objects.all().exclude(is_superuser = True).order_by('id')
     serializer_class = UuserSerializer
+    lookup_field = 'id'    
+  
+class Userdetails_For_Admin(ListAPIView):
+    queryset = Uuser.objects.all().exclude(is_superuser = True).order_by('id')
+    serializer_class = UuserSerializer
     lookup_field = 'id'
-
+    pagination_class= CustomPagination
+    
 class Artisans(ListAPIView):
     queryset=Uuser.objects.filter(is_artisan=True).order_by('id') 
-    serializer_class = UuserSerializer   
+    serializer_class = UuserSerializer 
     
-    
+class Block_Or_Unblock(UpdateAPIView):
+    lookup_field='id'
+    queryset = Uuser.objects.all()
+    serializer_class=EditUserSerializer
+    def patch(self, request, *args, **kwargs):
+        user_ID = self.kwargs['id']
+        block = request.data.get('is_active')       
+        try:
+            user= Uuser.objects.get(id=user_ID)
+        except:
+            return Response({"message":'User not found'}, status=status.HTTP_404_NOT_FOUND)              
+
+        if block:    
+            subject = 'ArtisanHub | Account Unblocked'
+            message = f'''Hello {user.first_name} {user.last_name}, 
+            Your Account has been reviewwed and activated back..! Continue to browse on ArtisanHub..'''
+            from_email = 'akshay.for.career@gmail.com'
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list)
+        else:
+            subject = 'ArtisanHub | Account Blocked'
+            message = f'''Hello {user.first_name} {user.last_name},
+            Your Account has been blocked due to some issues, Please contact admins for more details.'''
+            from_email = 'akshay.for.career@gmail.com'
+            recipient_list = [user.email]
+            send_mail(subject, message, from_email, recipient_list) 
+                      
+        return super().patch(request, *args, **kwargs)      
+       
 class UserRegister(CreateAPIView):
     queryset = Uuser.objects.all()
     serializer_class = UuserSerializer
@@ -83,9 +120,7 @@ class UserRegister(CreateAPIView):
         send_mail(subject, message, from_email, recipient_list)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-  
-  
-    
+     
 class VerifyUserView(GenericAPIView):
     def get(self, request, uidb64, token):
         try:
@@ -106,12 +141,8 @@ class VerifyUserView(GenericAPIView):
                 message = 'Activation Link expired, please register again.'
                 redirect_url = 'http://localhost:5173/signup' + '?message=' + message
                 return HttpResponseRedirect(redirect_url)  
-
-
-
-    
-def create_jwt_pair_tokens(user):
-    
+   
+def create_jwt_pair_tokens(user):   
     refresh = RefreshToken.for_user(user)
     refresh['username'] = user.email
     refresh['first_name'] = user.first_name
@@ -122,11 +153,9 @@ def create_jwt_pair_tokens(user):
     refresh['is_google'] = user.is_google
     refresh['id'] = user.id
 
-   
     access_token = str(refresh.access_token) # type: ignore
     refresh_token = str(refresh)
-
-    
+   
     return {
         "access": access_token,
         "refresh": refresh_token,
@@ -213,6 +242,16 @@ class Search_People(ListAPIView):
             )
 
         return queryset
+    
+class City_wise_Search(ListAPIView):
+    serializer_class = UuserSerializer  
+    
+    def get_queryset(self):
+        searchkey = self.kwargs['city']
+        queryset = Address.objects.filter(city__iexact=searchkey).values('user')
+        user_ids = queryset.distinct()
+        return Uuser.objects.filter(id__in=user_ids)
+
 
 class User_All_Data(RetrieveAPIView):
     queryset = Uuser.objects.all()
@@ -222,35 +261,7 @@ class User_All_Data(RetrieveAPIView):
 class Get_Locations (ListAPIView):
     queryset = Address.objects.values('city').distinct()
     serializer_class = Location_Serializer 
-    
-    
-class PasswordResetAPI(CreateAPIView):
-    serializer_class = PasswordResetSerializer
-
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            form = PasswordResetForm(request.data)
-            if form.is_valid():
-                form.save(request=request)
-            return Response({'message': 'Password reset email sent.'}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class CustomPasswordResetConfirmView(PasswordResetConfirmView, APIView):
-    template_name = 'password_reset_confirm.html'
-
-    @never_cache
-    def get(self, request, uidb64, token, *args, **kwargs):      
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = get_user_model().objects.filter(pk=uid).first()
-
-        if user is not None and default_token_generator.check_token(user, token):
-            login_url = reverse('your_login_url_name')
-            return HttpResponseRedirect(login_url)
-
-        return super().get(request, uidb64, token, *args, **kwargs)
-    
-    
+        
     
     
 class ChangePasswordView(generics.UpdateAPIView):
@@ -273,7 +284,71 @@ class ChangePasswordView(generics.UpdateAPIView):
             user.save()
             return Response({"message": "Password successfully updated."}, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ForgotPassword(APIView):
+    def post(self,request):
+        email = request.data.get('email')
+
+        if Uuser.objects.filter(email=email).exists():
+            user = Uuser.objects.get(email__exact=email)
+            if user.is_google:
+                return  Response(data={'message' : 'Please Login with google..'},status=status.HTTP_404_NOT_FOUND)
+            current_site = get_current_site(request)
+            domain = current_site.domain.rstrip('/')
+
+            mail_subject = 'Click this link to change your password'
+            message = render_to_string('user/forgotpassword.html',{
+                'user' : user,
+                'domain' : domain,
+                'uid' : urlsafe_base64_encode(force_bytes(user.pk)),
+                'token' : default_token_generator.make_token(user),
+                'site' : domain
+            })
+
+            to_email = email
+            send_mail = EmailMessage(mail_subject,message,to=[to_email])
+            send_mail.send()           
+
+            return Response(data={'message' : 'verification email has been sent to your email address','user_id' : user.id,},status=status.HTTP_200_OK)
+        else:
+            return Response(data={'message' : 'No account found'},status=status.HTTP_404_NOT_FOUND)
+ 
+        
+@api_view(['GET'])
+def reset_validate(request,uidb64,token): 
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = Uuser._default_manager.get(pk=uid)
+    except(TypeError,ValueError,Uuser.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user,token):
+       redirect_url = f'http://localhost:5173/resetpassword/?key={uidb64}&t={token}'
+       return HttpResponseRedirect(redirect_url)
+    
+
+
+class ResetPassword(APIView):
+    def post(self, request, uidb64, token, format=None):
+        password = request.data.get('password')
+        
+        if uidb64 and password:  
+            try:
+                user_id = urlsafe_base64_decode(uidb64).decode()
+                user = Uuser.objects.get(id=user_id)
+                if user is not None and default_token_generator.check_token(user,token):
+                    user.set_password(password)
+                    user.save()
+                    return Response(data={'message': 'Password has been reset successfully'}, status=status.HTTP_200_OK)
+                else:
+                    return Response(data={'message': 'Invalid token or user, please request for a new mail..'}, status=status.HTTP_400_BAD_REQUEST)
+            except (TypeError, ValueError, OverflowError, Uuser.DoesNotExist):
+                return Response(data={'message': 'Invalid token or user'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(data={'message': 'Token or password not provided'}, status=status.HTTP_400_BAD_REQUEST)    
     
       
 

@@ -49,6 +49,13 @@ class Work_Serializer(serializers.ModelSerializer):
     def get_comment_count(self, obj):
         return obj.get_comment_count()
     
+    
+
+class WorkDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Work
+        fields = ('date',)    
+    
                 
         
     
