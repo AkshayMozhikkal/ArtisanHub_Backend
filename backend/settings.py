@@ -119,20 +119,20 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('dbname'),
-        'USER': os.getenv('dbuser'),
-        'PASSWORD': os.getenv('dbpass'),
-        'HOST': os.getenv('dbhost'), 
-        'PORT': '5432',           
-    }
-}
-
 # DATABASES = {
-# 	"default": dj_database_url.parse("postgres://artisanhub_user:WbrB8rKpjFbDhYQQ3BspMdcFXDNvFlZk@dpg-cl5v7okn7k7c73cbagbg-a.singapore-postgres.render.com/artisanhub_fpv9")
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('dbname'),
+#         'USER': config('dbuser'),
+#         'PASSWORD': config('dbpass'),
+#         'HOST': config('dbhost'), 
+#         'PORT': '5432',           
+#     }
 # }
+
+DATABASES = {
+	"default": dj_database_url.parse("postgres://artisanhub_user:WbrB8rKpjFbDhYQQ3BspMdcFXDNvFlZk@dpg-cl5v7okn7k7c73cbagbg-a.singapore-postgres.render.com/artisanhub_fpv9")
+}
 
 
 
