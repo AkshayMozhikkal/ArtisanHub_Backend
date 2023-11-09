@@ -27,6 +27,7 @@ from rest_framework.decorators import api_view
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from decouple import config
 
 
 
@@ -131,15 +132,18 @@ class VerifyUserView(GenericAPIView):
                 user.is_active = True
                 user.save()
                 message = 'Congrats! Account activated!'
-                redirect_url = 'http://localhost:5173/login' + '?message=' + message
+                url = config('front_end_url') 
+                redirect_url = f'{url}login' + '?message=' + message
                 return HttpResponseRedirect(redirect_url)
             else:
                 message = 'Activation Link expired, please register again.'
-                redirect_url = 'http://localhost:5173/signup' + '?message=' + message
+                url = config('front_end_url') 
+                redirect_url = f'{url}signup' + '?message=' + message
                 return HttpResponseRedirect(redirect_url)
         except Exception as e:
                 message = 'Activation Link expired, please register again.'
-                redirect_url = 'http://localhost:5173/signup' + '?message=' + message
+                url = config('front_end_url') 
+                redirect_url = f'{url}signup' + '?message=' + message
                 return HttpResponseRedirect(redirect_url)  
    
 def create_jwt_pair_tokens(user):   
@@ -326,7 +330,8 @@ def reset_validate(request,uidb64,token):
         user = None
 
     if user is not None and default_token_generator.check_token(user,token):
-       redirect_url = f'http://localhost:5173/resetpassword/?key={uidb64}&t={token}'
+       url = config('front_end_url') 
+       redirect_url = f'{url}resetpassword/?key={uidb64}&t={token}'
        return HttpResponseRedirect(redirect_url)
     
 
