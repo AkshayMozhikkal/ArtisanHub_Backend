@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'channels',
     'chat',
+    'cloudinary',
+    'cloudinary_storage',
       
     
 ]
@@ -215,3 +217,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'akshay.for.career@gmail.com'  # Your Gmail email address
 EMAIL_HOST_PASSWORD = 'jfoywfikbateuzln'     # Your Gmail password or App Password
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dddnhzhfk',
+    'API_KEY': '441367976627735',
+    'API_SECRET': 'z51uZmWBKz4Ige2IEpFvK5mvMsM'
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
