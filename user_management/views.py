@@ -131,6 +131,13 @@ class VerifyUserView(GenericAPIView):
             if default_token_generator.check_token(user, token):
                 user.is_active = True
                 user.save()
+                # Send Mail
+                to_user_email = user.email
+                subject = "ArtisanHub| Account Activated"
+                message = f"Your Account is activated..!! Login to explore: {config('front_end_url')}login"
+                from_email = 'akshay.for.career@gmail.com'        
+                send_mail(subject, message, from_email, [to_user_email])
+                
                 message = 'Congrats! Account activated!'
                 url = config('front_end_url') 
                 redirect_url = f'{url}login' + '?message=' + message

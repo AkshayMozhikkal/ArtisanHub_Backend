@@ -7,6 +7,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.http import Http404
 from django.db.models import Q
+from django.core.mail import send_mail
+from decouple import config
 
 
 
@@ -117,7 +119,7 @@ class Connection_Request(CreateAPIView):
         from_user_id = request.data.get('from_user', None) 
         to_user_id = request.data.get('to_user', None)
 
-        if from_user_id== to_user_id:
+        if from_user_id == to_user_id:
             return Response({"error": "You cannot send a request to yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
         existing_request = Connection.objects.filter(from_user_id=from_user_id, to_user_id=to_user_id, status='p').first()
@@ -126,7 +128,15 @@ class Connection_Request(CreateAPIView):
             return Response({"error": "You've already sent a request to this user."}, status=status.HTTP_400_BAD_REQUEST)
         if accepted_request:
             return Response({"error": "You already have a connection with this user."}, status=status.HTTP_400_BAD_REQUEST)
-
+        
+        to_user_email = Uuser.objects.get(id=to_user_id).email
+        name = Uuser.objects.get(id=from_user_id).first_name 
+        subject = "ArtisanHub|Connection Request"
+        message = f"You have received a connection request from {name}. Log in to your account to respond: {config('front_end_url')}login"
+        from_email = 'akshay.for.career@gmail.com'
+        
+        send_mail(subject, message, from_email, [to_user_email])
+        
         return super().create(request, *args, **kwargs)
     
 
