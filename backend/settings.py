@@ -22,11 +22,12 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-bjr7b+#=axe_@k$%xppqm+n9wv@v&^p)cxf^do$*+0g(c1&#8u'
+SECRET_KEY = config('secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -95,8 +96,6 @@ TEMPLATES = [
 
 
 ASGI_APPLICATION = "backend.asgi.application"
-
-
 
 
 
@@ -214,13 +213,13 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'akshay.for.career@gmail.com'  # Your Gmail email address
-EMAIL_HOST_PASSWORD = 'jfoywfikbateuzln'     # Your Gmail password or App Password
+EMAIL_HOST_USER = config('email_host_user')  # Your Gmail email address
+EMAIL_HOST_PASSWORD = config('email_host_pswd')     # Your Gmail password or App Password
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dddnhzhfk',
-    'API_KEY': '441367976627735',
-    'API_SECRET': 'z51uZmWBKz4Ige2IEpFvK5mvMsM'
+    'CLOUD_NAME': config('cloud_name'),
+    'API_KEY': config('api_key'),
+    'API_SECRET': config('api_secret')
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
